@@ -1,0 +1,175 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f5f7fb;
+  color: #182230;
+}
+
+.app-layout {
+  min-height: 100vh;
+}
+
+.sidebar {
+  background: #ffffff !important;
+  border-right: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 18px;
+}
+
+.brand span {
+  display: block;
+  color: #667085;
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.brand-mark,
+.tool-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: #eaf2ff;
+  color: #1677ff;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 64px;
+  padding: 0 28px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.content {
+  padding: 28px;
+}
+
+.intro-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 8px 0 4px;
+}
+
+.intro-band h1 {
+  margin-bottom: 8px;
+  font-size: 34px;
+  line-height: 1.2;
+}
+
+.tool-shell {
+  max-width: 1240px;
+}
+
+.tool-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.tool-heading h2 {
+  margin: 0 0 4px;
+}
+
+.tool-heading .ant-typography {
+  margin-bottom: 0;
+  color: #667085;
+}
+
+.ant-card {
+  border: 1px solid #e5e7eb;
+  box-shadow: none;
+}
+
+.output-card {
+  min-height: 100%;
+}
+
+.output-card pre {
+  min-height: 340px;
+  max-height: 520px;
+  overflow: auto;
+  padding: 14px;
+  margin: 0 0 14px;
+  background: #101828;
+  color: #f9fafb;
+  border-radius: 8px;
+  white-space: pre-wrap;
+  font-family: Consolas, "Liberation Mono", monospace;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.library-card {
+  height: 100%;
+}
+
+.library-card .ant-card-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 250px;
+}
+
+.library-card .ant-typography {
+  flex: 1;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ant-menu {
+  border-inline-end: none !important;
+}
+
+.ant-menu-item {
+  height: 44px !important;
+  margin: 4px 10px !important;
+  width: calc(100% - 20px) !important;
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 18px;
+  }
+
+  .topbar {
+    justify-content: flex-start;
+    padding: 0 18px;
+  }
+
+  .intro-band h1 {
+    font-size: 26px;
+  }
+
+  .tool-heading {
+    align-items: center;
+  }
+
+  .output-card pre {
+    min-height: 260px;
+  }
+}
