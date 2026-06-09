@@ -74,7 +74,11 @@ function OutputCard({ title, value }) {
   return (
     <Card className="output-card" title={title}>
       <pre>{value || "Điền thông tin ở bên trái để tạo nội dung mẫu."}</pre>
-      <Button icon={<Clipboard size={16} />} disabled={!value} onClick={() => copyText(value)}>
+      <Button
+        icon={<Clipboard size={16} />}
+        disabled={!value}
+        onClick={() => copyText(value)}
+      >
         Sao chép
       </Button>
     </Card>
@@ -126,10 +130,16 @@ function PromptBuilder() {
                 </Col>
               </Row>
               <Form.Item name="context" label="Bối cảnh">
-                <TextArea rows={3} placeholder="Tình huống, lĩnh vực, dữ liệu nền..." />
+                <TextArea
+                  rows={3}
+                  placeholder="Tình huống, lĩnh vực, dữ liệu nền..."
+                />
               </Form.Item>
               <Form.Item name="task" label="Việc cần AI làm">
-                <TextArea rows={3} placeholder="VD: soạn email, tạo slide, phân tích dữ liệu..." />
+                <TextArea
+                  rows={3}
+                  placeholder="VD: soạn email, tạo slide, phân tích dữ liệu..."
+                />
               </Form.Item>
               <Row gutter={12}>
                 <Col xs={24} md={12}>
@@ -137,10 +147,19 @@ function PromptBuilder() {
                     <Select
                       placeholder="Chọn văn phong"
                       options={[
-                        { value: "lịch sự, rõ ràng, dễ hiểu", label: "Lịch sự" },
-                        { value: "ngắn gọn, trực tiếp, thực tế", label: "Ngắn gọn" },
+                        {
+                          value: "lịch sự, rõ ràng, dễ hiểu",
+                          label: "Lịch sự",
+                        },
+                        {
+                          value: "ngắn gọn, trực tiếp, thực tế",
+                          label: "Ngắn gọn",
+                        },
                         { value: "học thuật, có lập luận", label: "Học thuật" },
-                        { value: "truyền cảm hứng, gần gũi", label: "Truyền cảm hứng" },
+                        {
+                          value: "truyền cảm hứng, gần gũi",
+                          label: "Truyền cảm hứng",
+                        },
                       ]}
                     />
                   </Form.Item>
@@ -155,7 +174,10 @@ function PromptBuilder() {
                 <Input placeholder="VD: dưới 150 từ, có CTA, không dùng thuật ngữ kỹ thuật" />
               </Form.Item>
               <Form.Item name="example" label="Ví dụ mẫu">
-                <TextArea rows={2} placeholder="Dán mẫu phong cách hoặc cấu trúc mong muốn" />
+                <TextArea
+                  rows={2}
+                  placeholder="Dán mẫu phong cách hoặc cấu trúc mong muốn"
+                />
               </Form.Item>
             </Form>
           </Card>
@@ -207,16 +229,32 @@ function WorkflowPlanner() {
                 <Input placeholder="VD: chuẩn bị báo cáo tổng kết tháng" />
               </Form.Item>
               <Form.Item name="inputs" label="Dữ liệu đầu vào">
-                <TextArea rows={3} placeholder="Tài liệu, số liệu, email, quy định..." />
+                <TextArea
+                  rows={3}
+                  placeholder="Tài liệu, số liệu, email, quy định..."
+                />
               </Form.Item>
               <Form.Item name="toolType" label="Loại công cụ AI phù hợp">
                 <Select
                   placeholder="Chọn theo tính chất công việc"
                   options={[
-                    { value: "ChatGPT/Claude/Gemini cho viết và tổng hợp", label: "Viết & tổng hợp" },
-                    { value: "Perplexity/Gemini cho tìm kiếm có nguồn", label: "Tra cứu online" },
-                    { value: "NotebookLM/Claude cho tài liệu tải lên", label: "Xử lý tài liệu" },
-                    { value: "Copilot/Gemini Workspace nếu làm trong hệ sinh thái văn phòng", label: "Office workspace" },
+                    {
+                      value: "ChatGPT/Claude/Gemini cho viết và tổng hợp",
+                      label: "Viết & tổng hợp",
+                    },
+                    {
+                      value: "Perplexity/Gemini cho tìm kiếm có nguồn",
+                      label: "Tra cứu online",
+                    },
+                    {
+                      value: "NotebookLM/Claude cho tài liệu tải lên",
+                      label: "Xử lý tài liệu",
+                    },
+                    {
+                      value:
+                        "Copilot/Gemini Workspace nếu làm trong hệ sinh thái văn phòng",
+                      label: "Office workspace",
+                    },
                   ]}
                 />
               </Form.Item>
@@ -335,7 +373,11 @@ Thông tin cần kiểm chứng:
           <Card>
             <Space direction="vertical" size={16} className="full-width">
               <Progress percent={percent} />
-              <Checkbox.Group value={checked} onChange={setChecked} className="checklist">
+              <Checkbox.Group
+                value={checked}
+                onChange={setChecked}
+                className="checklist"
+              >
                 {checklist.map((item) => (
                   <Checkbox key={item} value={item}>
                     {item}
@@ -385,7 +427,10 @@ Dữ liệu:
           <Card>
             <Form layout="vertical" onValuesChange={(_, all) => setValues(all)}>
               <Form.Item name="question" label="Câu hỏi phân tích">
-                <TextArea rows={3} placeholder="VD: Vì sao doanh số tháng này giảm và nên làm gì?" />
+                <TextArea
+                  rows={3}
+                  placeholder="VD: Vì sao doanh số tháng này giảm và nên làm gì?"
+                />
               </Form.Item>
               <Form.Item name="scope" label="Phạm vi dữ liệu">
                 <Input placeholder="VD: doanh số 6 tháng, 3 chi nhánh" />
@@ -470,10 +515,16 @@ test_cases:
                 <Input placeholder="VD: tro_giang, faq_noi_bo, tro_ly_ca_nhan" />
               </Form.Item>
               <Form.Item name="goal" label="Mục tiêu">
-                <TextArea rows={2} placeholder="Trợ lý này giúp ai, làm việc gì?" />
+                <TextArea
+                  rows={2}
+                  placeholder="Trợ lý này giúp ai, làm việc gì?"
+                />
               </Form.Item>
               <Form.Item name="scope" label="Phạm vi/giới hạn">
-                <TextArea rows={2} placeholder="Không trả lời vấn đề nào? Dựa trên nguồn nào?" />
+                <TextArea
+                  rows={2}
+                  placeholder="Không trả lời vấn đề nào? Dựa trên nguồn nào?"
+                />
               </Form.Item>
               <Form.Item name="test" label="Test case nhanh">
                 <Input placeholder="VD: AI Agent khác chatbot ở đâu?" />
@@ -484,8 +535,18 @@ test_cases:
         <Col xs={24} lg={12}>
           <Tabs
             items={[
-              { key: "instruction", label: "instruction.txt", children: <OutputCard title="Instruction" value={instruction} /> },
-              { key: "yaml", label: "agent.yaml", children: <OutputCard title="YAML cấu hình" value={yaml} /> },
+              {
+                key: "instruction",
+                label: "instruction.txt",
+                children: (
+                  <OutputCard title="Instruction" value={instruction} />
+                ),
+              },
+              {
+                key: "yaml",
+                label: "agent.yaml",
+                children: <OutputCard title="YAML cấu hình" value={yaml} />,
+              },
             ]}
           />
         </Col>
@@ -506,7 +567,10 @@ function PromptLibrary() {
           <Col xs={24} md={12} xl={8} key={item.title}>
             <Card className="library-card" title={item.title}>
               <Paragraph>{item.text}</Paragraph>
-              <Button icon={<Clipboard size={16} />} onClick={() => copyText(item.text)}>
+              <Button
+                icon={<Clipboard size={16} />}
+                onClick={() => copyText(item.text)}
+              >
                 Sao chép
               </Button>
             </Card>
@@ -560,7 +624,12 @@ function App() {
     >
       <AntApp>
         <Layout className="app-layout">
-          <Sider className="sidebar" width={264} breakpoint="lg" collapsedWidth="0">
+          <Sider
+            className="sidebar"
+            width={264}
+            breakpoint="lg"
+            collapsedWidth="0"
+          >
             <div className="brand">
               <div className="brand-mark">
                 <Lightbulb size={22} />
@@ -570,7 +639,12 @@ function App() {
                 <span>Cho người mới bắt đầu</span>
               </div>
             </div>
-            <Menu mode="inline" selectedKeys={[active]} items={menuItems} onClick={({ key }) => setActive(key)} />
+            <Menu
+              mode="inline"
+              selectedKeys={[active]}
+              items={menuItems}
+              onClick={({ key }) => setActive(key)}
+            />
           </Sider>
           <Layout>
             <Header className="topbar">
@@ -586,9 +660,6 @@ function App() {
               <div className="intro-band">
                 <div>
                   <Title level={1}>Bộ công cụ thực hành AI cơ bản</Title>
-                  <Text>
-                    Website hỗ trợ học viên nontech chuyển kiến thức trong khóa học thành prompt, checklist và quy trình dùng được ngay trong công việc.
-                  </Text>
                 </div>
               </div>
               <Divider />
