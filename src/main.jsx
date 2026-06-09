@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   App as AntApp,
@@ -70,6 +70,50 @@ const copyText = async (text) => {
   message.success("Đã sao chép");
 };
 
+const STORAGE_PREFIX = "ai-practice-toolkit";
+
+function readStoredValue(key, fallback) {
+  try {
+    const rawValue = window.localStorage.getItem(`${STORAGE_PREFIX}:${key}`);
+    return rawValue ? JSON.parse(rawValue) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeStoredValue(key, value) {
+  try {
+    window.localStorage.setItem(`${STORAGE_PREFIX}:${key}`, JSON.stringify(value));
+  } catch {
+    // Ignore storage failures so forms still work normally.
+  }
+}
+
+function useStoredState(key, fallback) {
+  const [value, setValue] = useState(() => readStoredValue(key, fallback));
+
+  const updateValue = (nextValue) => {
+    setValue((currentValue) => {
+      const resolvedValue =
+        typeof nextValue === "function" ? nextValue(currentValue) : nextValue;
+      writeStoredValue(key, resolvedValue);
+      return resolvedValue;
+    });
+  };
+
+  return [value, updateValue];
+}
+
+function useSavedFormValues(key) {
+  const [values, setValues] = useStoredState(key, {});
+
+  const handleValuesChange = (_, allValues) => {
+    setValues(allValues);
+  };
+
+  return [values, handleValuesChange];
+}
+
 function OutputCard({ title, value }) {
   return (
     <Card className="output-card" title={title}>
@@ -87,10 +131,11 @@ function OutputCard({ title, value }) {
 
 function PromptBuilder() {
   const [form] = Form.useForm();
+  const [storedValues, handleStoredValuesChange] = useSavedFormValues("prompt-builder");
   const [result, setResult] = useState("");
 
-  const buildPrompt = () => {
-    const values = form.getFieldsValue();
+  const buildPrompt = (nextValues) => {
+    const values = nextValues || form.getFieldsValue();
     const prompt = [
       values.role && `Bạn là ${values.role}.`,
       values.context && `Bối cảnh: ${values.context}`,
@@ -107,6 +152,11 @@ function PromptBuilder() {
     setResult(prompt);
   };
 
+  useEffect(() => {
+    form.setFieldsValue(storedValues);
+    buildPrompt(storedValues);
+  }, []);
+
   return (
     <ToolShell
       icon={<PenTool />}
@@ -116,7 +166,15 @@ function PromptBuilder() {
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={13}>
           <Card>
-            <Form form={form} layout="vertical" onValuesChange={buildPrompt}>
+            <Form
+              form={form}
+              layout="vertical"
+              initialValues={storedValues}
+              onValuesChange={(_, allValues) => {
+                handleStoredValuesChange(_, allValues);
+                buildPrompt(allValues);
+              }}
+            >
               <Row gutter={12}>
                 <Col xs={24} md={12}>
                   <Form.Item name="role" label="Vai trò AI">
@@ -272,8 +330,236 @@ function WorkflowPlanner() {
   );
 }
 
+function suggestChapter3Tools(values) {
+  const suggestions = [];
+
+  if (values.workType?.includes("Sáng tạo")) {
+    suggestions.push(
+      "- ChatGPT/Claude: viết lách, brainstorming; Canva/Gamma: thiết kế và slide.",
+    );
+  }
+  if (values.workType?.includes("Phân tích")) {
+    suggestions.push(
+      "- ChatGPT/Claude: phân tích logic; NotebookLM: phân tích tài liệu nội bộ; Formula Bot: công thức Excel.",
+    );
+  }
+  if (values.workType?.includes("Tra cứu")) {
+    suggestions.push(
+      "- Perplexity/Gemini: tìm kiếm thông tin thời gian thực có nguồn dẫn.",
+    );
+  }
+  if (values.dataSource?.includes("offline")) {
+    suggestions.push(
+      "- NotebookLM/Claude: ưu tiên khi cần đọc tệp tải lên và bám sát nguồn tài liệu.",
+    );
+  }
+  if (values.dataSource?.includes("online")) {
+    suggestions.push(
+      "- Perplexity/Gemini: ưu tiên khi cần dữ liệu mới, link nguồn và tra cứu web.",
+    );
+  }
+  if (values.ecosystem?.includes("Microsoft")) {
+    suggestions.push(
+      "- Copilot: phù hợp khi công việc nằm trong Word, Excel, Microsoft 365.",
+    );
+  }
+  if (values.ecosystem?.includes("Google")) {
+    suggestions.push(
+      "- Gemini: phù hợp khi công việc nằm trong Gmail, Docs, Sheets, Drive.",
+    );
+  }
+
+  return suggestions.length
+    ? suggestions.join("\n")
+    : "- Chọn công cụ theo đúng việc: ChatGPT/Claude cho viết và lập luận, Gemini/Perplexity cho tra cứu, NotebookLM cho tài liệu tải lên.";
+}
+
+function WorkflowPlannerChapter3() {
+  const [values, handleValuesChange] = useSavedFormValues("workflow-planner");
+  const output = useMemo(() => {
+    if (!values.goal) return "";
+
+    return `Workflow ứng dụng AI
+
+Mục tiêu công việc: ${values.goal}
+Tư duy AI Co-pilot: Bạn định hướng và quyết định cuối cùng; AI hỗ trợ thực thi nhanh, tóm tắt và gợi ý.
+
+GĐ 1: Context & Data
+- Vai trò AI: ${values.role || "xác định rõ vai trò, ví dụ chuyên gia marketing, trợ lý đào tạo"}
+- Dữ liệu/bối cảnh cần cung cấp: ${values.inputs || "tài liệu tham khảo, thông tin nền, yêu cầu cụ thể"}
+- Làm sạch đầu vào: bỏ thông tin dư thừa, sắp xếp theo thời gian/chủ đề, loại bỏ dữ liệu nhạy cảm trước khi đưa lên cloud.
+
+GĐ 2: Prompt Engineering
+- Prompt mẫu:
+Bạn là ${values.role || "trợ lý chuyên môn"}. Hãy hỗ trợ tôi hoàn thành nhiệm vụ: ${values.goal}.
+Bối cảnh/dữ liệu: ${values.inputs || "[dán dữ liệu đã làm sạch]"}.
+Yêu cầu làm theo từng bước, tránh trả lời chung chung.
+Định dạng đầu ra: ${values.format || "danh sách gạch đầu dòng hoặc bảng rõ ràng"}.
+- Nếu là email/thông báo, hãy nêu đủ: lời chào, thời gian/địa điểm, mục tiêu, tài liệu cần chuẩn bị và yêu cầu phản hồi xác nhận.
+
+GĐ 3: Verify
+- Kiểm tra số liệu, ngày tháng và tên riêng.
+- Kiểm tra citation/link nguồn xem có thực hay không.
+- Đánh giá tính khách quan, định kiến và khả năng AI bịa thông tin.
+- Quy tắc: tin tưởng nhưng phải kiểm chứng.
+
+GĐ 4: Refine
+- Điều chỉnh giọng văn cho phù hợp văn hóa doanh nghiệp/đơn vị.
+- Bổ sung kinh nghiệm thực tế mà AI không biết.
+- Chỉnh sửa lại nội dung quan trọng để tăng tính sở hữu và giảm rủi ro bản quyền.
+- Lưu prompt tốt thành template cho lần sau.
+
+Gợi ý chọn công cụ
+- Tính chất công việc: ${values.workType || "sáng tạo / phân tích / tra cứu"}
+- Nguồn dữ liệu: ${values.dataSource || "online / offline / hệ thống"}
+- Bảo mật & tuân thủ: ${values.security || "kiểm tra dữ liệu khách hàng, mã nguồn, chiến lược chưa công bố"}
+- Hệ sinh thái sẵn có: ${values.ecosystem || "Microsoft 365 / Google Workspace / công cụ độc lập"}
+- Chi phí & ROI: ${values.roi || "miễn phí / pro / enterprise"}
+
+Công cụ nên cân nhắc:
+${suggestChapter3Tools(values)}`;
+  }, [values]);
+
+  return (
+    <ToolShell
+      icon={<Workflow />}
+      title="AI Workflow Planner"
+      subtitle="Context & Data - Prompt Engineering - Verify - Refine, kèm tiêu chí chọn công cụ AI."
+    >
+      <Row gutter={[16, 16]}>
+        <Col xs={24} lg={12}>
+          <Card>
+            <Form
+              layout="vertical"
+              initialValues={values}
+              onValuesChange={handleValuesChange}
+            >
+              <Form.Item name="goal" label="Mục tiêu công việc">
+                <Input placeholder="VD: chuẩn bị báo cáo tổng kết tháng" />
+              </Form.Item>
+              <Form.Item name="role" label="Vai trò AI">
+                <Input placeholder="VD: chuyên gia marketing, trợ lý đào tạo, chuyên viên phân tích" />
+              </Form.Item>
+              <Form.Item name="inputs" label="Context & Data">
+                <TextArea
+                  rows={3}
+                  placeholder="Dữ liệu nền, tài liệu tham khảo, email, số liệu, quy định..."
+                />
+              </Form.Item>
+              <Form.Item name="format" label="Định dạng đầu ra">
+                <Input placeholder="VD: bảng hành động, email, 8 slide, checklist" />
+              </Form.Item>
+              <Form.Item
+                name="workType"
+                label="Tiêu chí 1: Tính chất công việc"
+              >
+                <Select
+                  placeholder="Chọn nhóm việc"
+                  options={[
+                    {
+                      value:
+                        "Sáng tạo: viết content, lên ý tưởng, thiết kế hình ảnh",
+                      label: "Sáng tạo",
+                    },
+                    {
+                      value:
+                        "Phân tích: xử lý số liệu, lập trình, tóm tắt báo cáo",
+                      label: "Phân tích",
+                    },
+                    {
+                      value:
+                        "Tra cứu: tìm kiếm thông tin, nghiên cứu thị trường",
+                      label: "Tra cứu",
+                    },
+                  ]}
+                />
+              </Form.Item>
+              <Form.Item name="dataSource" label="Tiêu chí 2: Nguồn dữ liệu">
+                <Select
+                  placeholder="Chọn nguồn dữ liệu"
+                  options={[
+                    {
+                      value:
+                        "Dữ liệu online: cần AI có kết nối internet thời gian thực",
+                      label: "Online",
+                    },
+                    {
+                      value: "Dữ liệu offline: cần AI đọc và hiểu tệp tải lên",
+                      label: "Offline/file tải lên",
+                    },
+                    {
+                      value: "Dữ liệu hệ thống: cần AI tích hợp CRM/ERP/nội bộ",
+                      label: "Hệ thống",
+                    },
+                  ]}
+                />
+              </Form.Item>
+              <Form.Item name="security" label="Tiêu chí 3: Bảo mật & tuân thủ">
+                <Input placeholder="VD: không đưa danh sách khách hàng, mã nguồn, chiến lược chưa công bố lên AI miễn phí" />
+              </Form.Item>
+              <Row gutter={12}>
+                <Col xs={24} md={12}>
+                  <Form.Item name="ecosystem" label="Tiêu chí 4: Hệ sinh thái">
+                    <Select
+                      placeholder="Chọn hệ sinh thái"
+                      options={[
+                        {
+                          value:
+                            "Microsoft 365: ưu tiên Copilot trong Word, Excel",
+                          label: "Microsoft 365",
+                        },
+                        {
+                          value:
+                            "Google Workspace: ưu tiên Gemini trong Gmail, Docs",
+                          label: "Google Workspace",
+                        },
+                        {
+                          value:
+                            "Công cụ độc lập: dùng cho nhu cầu chuyên biệt",
+                          label: "Độc lập",
+                        },
+                      ]}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Form.Item name="roi" label="Tiêu chí 5: Chi phí & ROI">
+                    <Select
+                      placeholder="Chọn mức đầu tư"
+                      options={[
+                        {
+                          value:
+                            "Miễn phí: phù hợp thử nghiệm, hạn chế tốc độ/tính năng",
+                          label: "Miễn phí",
+                        },
+                        {
+                          value:
+                            "Pro: tăng năng suất, cần tính lợi ích kinh tế",
+                          label: "Pro",
+                        },
+                        {
+                          value:
+                            "Enterprise: quản lý tập trung, bảo mật cao nhất",
+                          label: "Enterprise",
+                        },
+                      ]}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Form>
+          </Card>
+        </Col>
+        <Col xs={24} lg={12}>
+          <OutputCard title="Workflow" value={output} />
+        </Col>
+      </Row>
+    </ToolShell>
+  );
+}
+
 function CreativeTool() {
-  const [values, setValues] = useState({});
+  const [values, handleValuesChange] = useSavedFormValues("creative-tool");
   const output = values.topic
     ? `Hãy viết nội dung theo công thức AIDA cho chủ đề: ${values.topic}
 
@@ -301,7 +587,11 @@ Yêu cầu thêm:
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
           <Card>
-            <Form layout="vertical" onValuesChange={(_, all) => setValues(all)}>
+            <Form
+              layout="vertical"
+              initialValues={values}
+              onValuesChange={handleValuesChange}
+            >
               <Form.Item name="topic" label="Chủ đề/sản phẩm/dịch vụ">
                 <Input placeholder="VD: khóa học AI cơ bản cho giảng viên" />
               </Form.Item>
@@ -340,7 +630,7 @@ Yêu cầu thêm:
 }
 
 function ResearchVerifier() {
-  const [checked, setChecked] = useState([]);
+  const [checked, setChecked] = useStoredState("research-verifier", []);
   const percent = Math.round((checked.length / 6) * 100);
   const checklist = [
     "Có link nguồn gốc, không chỉ có phần tóm tắt của AI",
@@ -396,7 +686,7 @@ Thông tin cần kiểm chứng:
 }
 
 function AnalyticsTool() {
-  const [values, setValues] = useState({});
+  const [values, handleValuesChange] = useSavedFormValues("analytics-tool");
   const output = values.question
     ? `Hãy phân tích dữ liệu theo khung ANALYTICA.
 
@@ -425,7 +715,11 @@ Dữ liệu:
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
           <Card>
-            <Form layout="vertical" onValuesChange={(_, all) => setValues(all)}>
+            <Form
+              layout="vertical"
+              initialValues={values}
+              onValuesChange={handleValuesChange}
+            >
               <Form.Item name="question" label="Câu hỏi phân tích">
                 <TextArea
                   rows={3}
@@ -462,7 +756,7 @@ Dữ liệu:
 }
 
 function AgentDesigner() {
-  const [values, setValues] = useState({});
+  const [values, handleValuesChange] = useSavedFormValues("agent-designer");
   const instruction = values.name
     ? `Bạn là ${values.name}.
 
@@ -507,7 +801,11 @@ test_cases:
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
           <Card>
-            <Form layout="vertical" onValuesChange={(_, all) => setValues(all)}>
+            <Form
+              layout="vertical"
+              initialValues={values}
+              onValuesChange={handleValuesChange}
+            >
               <Form.Item name="name" label="Tên trợ lý">
                 <Input placeholder="VD: Trợ giảng AI cơ bản" />
               </Form.Item>
@@ -597,10 +895,10 @@ function ToolShell({ icon, title, subtitle, children }) {
 }
 
 function App() {
-  const [active, setActive] = useState("prompt");
+  const [active, setActive] = useStoredState("active-menu", "prompt");
   const current = {
     prompt: <PromptBuilder />,
-    workflow: <WorkflowPlanner />,
+    workflow: <WorkflowPlannerChapter3 />,
     creative: <CreativeTool />,
     research: <ResearchVerifier />,
     analytics: <AnalyticsTool />,
