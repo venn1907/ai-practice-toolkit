@@ -27,7 +27,6 @@ import {
   Clipboard,
   FileCheck,
   Library,
-  Lightbulb,
   PenTool,
   SearchCheck,
   Sparkles,
@@ -930,11 +929,11 @@ function App() {
           >
             <div className="brand">
               <div className="brand-mark">
-                <Lightbulb size={22} />
+                <img src="/logo-dtc.jpg" alt="DTC" />
               </div>
               <div>
-                <Text strong>AI Practice Toolkit</Text>
-                <span>Cho người mới bắt đầu</span>
+                <Text strong>Trung tâm Chuyển đổi số</Text>
+                <span>AI Practice Toolkit</span>
               </div>
             </div>
             <Menu
