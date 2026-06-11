@@ -16,6 +16,7 @@ import {
   Row,
   Select,
   Space,
+  Switch,
   Tabs,
   Tag,
   Typography,
@@ -113,6 +114,127 @@ function useSavedFormValues(key) {
   return [values, handleValuesChange];
 }
 
+const englishInterfaceMap = {
+  "Trung tâm Chuyển đổi số": "Digital Transformation Center",
+  "Bộ công cụ thực hành AI cơ bản": "Basic AI Practice Toolkit",
+  "Biến yêu cầu mơ hồ thành prompt có vai trò, bối cảnh, định dạng và tiêu chí rõ ràng.": "Turn vague requests into prompts with clear role, context, format, and criteria.",
+  "Context & Data - Prompt Engineering - Verify - Refine, kèm tiêu chí chọn công cụ AI.": "Context & Data - Prompt Engineering - Verify - Refine, with AI tool selection criteria.",
+  "Tạo prompt viết nội dung truyền thông, bài phát biểu, báo cáo hoặc ý tưởng hình ảnh theo cấu trúc rõ ràng.": "Create prompts for marketing content, speeches, reports, or visual ideas using a clear structure.",
+  "Giúp người học tránh hallucination, kiểm tra trích dẫn, tên miền, ngày tháng và xác thực chéo.": "Help learners avoid hallucinations, check citations, domains, dates, and cross-verify information.",
+  "Tạo prompt phân tích mô tả, chẩn đoán, dự báo và đề xuất theo khung trong bài giảng.": "Create prompts for descriptive, diagnostic, predictive, and prescriptive analysis.",
+  "Thiết kế instruction, knowledge base và bộ test nhanh cho trợ lý AI cá nhân hoặc FAQ nội bộ.": "Design instructions, knowledge bases, and quick test cases for personal AI assistants or internal FAQs.",
+  "Các prompt nền từ bài giảng để học viên sao chép, chỉnh sửa và lưu lại thành tài sản cá nhân.": "Starter prompts from the lessons for learners to copy, edit, and save as personal assets.",
+  "Sáng tạo": "Creative",
+  "Kiểm chứng": "Verification",
+  "Phân tích": "Analytics",
+  "Thư viện": "Library",
+  "Sao chép": "Copy",
+  "Điền thông tin ở bên trái để tạo nội dung mẫu.": "Fill in the fields on the left to generate a draft.",
+  "Prompt đã tối ưu": "Optimized Prompt",
+  "Vai trò AI": "AI Role",
+  "Người đọc/người dùng": "Reader/User",
+  "Bối cảnh": "Context",
+  "Việc cần AI làm": "Task for AI",
+  "Văn phong": "Tone",
+  "Định dạng đầu ra": "Output Format",
+  "Ràng buộc": "Constraints",
+  "Ví dụ mẫu": "Example",
+  "Chọn văn phong": "Select tone",
+  "Lịch sự": "Polite",
+  "Ngắn gọn": "Concise",
+  "Học thuật": "Academic",
+  "Truyền cảm hứng": "Inspirational",
+  "Mục tiêu công việc": "Work Goal",
+  "Context & Data": "Context & Data",
+  "Tiêu chí 1: Tính chất công việc": "Criterion 1: Work Type",
+  "Tiêu chí 2: Nguồn dữ liệu": "Criterion 2: Data Source",
+  "Tiêu chí 3: Bảo mật & tuân thủ": "Criterion 3: Security & Compliance",
+  "Tiêu chí 4: Hệ sinh thái": "Criterion 4: Ecosystem",
+  "Tiêu chí 5: Chi phí & ROI": "Criterion 5: Cost & ROI",
+  "Chọn nhóm việc": "Select work type",
+  "Chọn nguồn dữ liệu": "Select data source",
+  "Chọn hệ sinh thái": "Select ecosystem",
+  "Chọn mức đầu tư": "Select investment level",
+  "Workflow": "Workflow",
+  "Chủ đề/sản phẩm/dịch vụ": "Topic/Product/Service",
+  "Đối tượng": "Audience",
+  "Kênh": "Channel",
+  "Độ dài": "Length",
+  "Chọn kênh": "Select channel",
+  "Bài phát biểu": "Speech",
+  "Prompt sáng tạo AIDA": "AIDA Creative Prompt",
+  "Prompt kiểm chứng": "Verification Prompt",
+  "Câu hỏi phân tích": "Analysis Question",
+  "Phạm vi dữ liệu": "Data Scope",
+  "Bối cảnh nghiệp vụ": "Business Context",
+  "Cần so sánh": "Compare By",
+  "Tên trợ lý": "Assistant Name",
+  "Vai trò": "Role",
+  "Mục tiêu": "Goal",
+  "Phạm vi/giới hạn": "Scope/Limits",
+  "Test case nhanh": "Quick Test Case",
+  "Instruction": "Instruction",
+  "YAML cấu hình": "YAML Config",
+  "Tạo slide": "Create Slides",
+  "Tóm tắt tài liệu": "Summarize Document",
+  "Email thông báo": "Notification Email",
+};
+
+const englishAttributeMap = {
+  "VD: chuyên viên đào tạo": "E.g. training specialist",
+  "VD: sinh viên năm nhất": "E.g. first-year students",
+  "Tình huống, lĩnh vực, dữ liệu nền...": "Situation, field, background data...",
+  "VD: soạn email, tạo slide, phân tích dữ liệu...": "E.g. write an email, create slides, analyze data...",
+  "VD: bảng, 8 slide, 5 bullet...": "E.g. table, 8 slides, 5 bullets...",
+  "VD: dưới 150 từ, có CTA, không dùng thuật ngữ kỹ thuật": "E.g. under 150 words, include CTA, avoid technical jargon",
+  "Dán mẫu phong cách hoặc cấu trúc mong muốn": "Paste a preferred style or structure sample",
+  "VD: chuẩn bị báo cáo tổng kết tháng": "E.g. prepare a monthly summary report",
+  "VD: chuyên gia marketing, trợ lý đào tạo, chuyên viên phân tích": "E.g. marketing expert, training assistant, analyst",
+  "Dữ liệu nền, tài liệu tham khảo, email, số liệu, quy định...": "Background data, references, emails, figures, policies...",
+  "VD: bảng hành động, email, 8 slide, checklist": "E.g. action table, email, 8 slides, checklist",
+  "VD: không đưa danh sách khách hàng, mã nguồn, chiến lược chưa công bố lên AI miễn phí": "E.g. do not upload customer lists, source code, or unpublished strategy to free AI tools",
+  "VD: khóa học AI cơ bản cho giảng viên": "E.g. basic AI course for lecturers",
+  "VD: nhân viên hành chính, giảng viên, sinh viên": "E.g. admin staff, lecturers, students",
+  "VD: 150 từ, 5 phút, 8 slide": "E.g. 150 words, 5 minutes, 8 slides",
+  "VD: Vì sao doanh số tháng này giảm và nên làm gì?": "E.g. Why did sales drop this month and what should we do?",
+  "VD: doanh số 6 tháng, 3 chi nhánh": "E.g. 6 months of sales, 3 branches",
+  "VD: vừa chạy chiến dịch marketing mới": "E.g. just launched a new marketing campaign",
+  "VD: theo tháng, nhóm khách hàng": "E.g. by month, customer segment",
+  "VD: bảng + 5 khuyến nghị": "E.g. table + 5 recommendations",
+  "VD: Trợ giảng AI cơ bản": "E.g. Basic AI Teaching Assistant",
+  "VD: tro_giang, faq_noi_bo, tro_ly_ca_nhan": "E.g. teaching_assistant, internal_faq, personal_assistant",
+  "Trợ lý này giúp ai, làm việc gì?": "Who does this assistant help, and what does it do?",
+  "Không trả lời vấn đề nào? Dựa trên nguồn nào?": "What should it not answer? Which sources should it use?",
+  "VD: AI Agent khác chatbot ở đâu?": "E.g. How is an AI Agent different from a chatbot?",
+};
+
+function applyEnglishInterface(root) {
+  const textNodes = [];
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let currentNode = walker.nextNode();
+
+  while (currentNode) {
+    textNodes.push(currentNode);
+    currentNode = walker.nextNode();
+  }
+
+  textNodes.forEach((node) => {
+    const originalText = node.nodeValue;
+    const trimmedText = originalText.trim();
+
+    if (englishInterfaceMap[trimmedText]) {
+      node.nodeValue = originalText.replace(trimmedText, englishInterfaceMap[trimmedText]);
+    }
+  });
+
+  root.querySelectorAll("[placeholder]").forEach((element) => {
+    const placeholder = element.getAttribute("placeholder");
+    if (englishAttributeMap[placeholder]) {
+      element.setAttribute("placeholder", englishAttributeMap[placeholder]);
+    }
+  });
+}
+
 function OutputCard({ title, value }) {
   return (
     <Card className="output-card" title={title}>
@@ -128,13 +250,30 @@ function OutputCard({ title, value }) {
   );
 }
 
-function PromptBuilder() {
+function PromptBuilder({ language = "vi" }) {
   const [form] = Form.useForm();
   const [storedValues, handleStoredValuesChange] = useSavedFormValues("prompt-builder");
   const [result, setResult] = useState("");
 
   const buildPrompt = (nextValues) => {
     const values = nextValues || form.getFieldsValue();
+    if (language === "en") {
+      const prompt = [
+        values.role && `You are ${values.role}.`,
+        values.context && `Context: ${values.context}`,
+        values.task && `Task: ${values.task}`,
+        values.audience && `Target audience: ${values.audience}`,
+        values.tone && `Tone: ${values.tone}.`,
+        values.format && `Output format: ${values.format}.`,
+        values.constraints && `Constraints: ${values.constraints}`,
+        values.example && `Reference example: ${values.example}`,
+        "Before answering, check whether the request is missing any important information. If something is missing, ask a brief clarifying question.",
+      ]
+        .filter(Boolean)
+        .join("\n");
+      setResult(prompt);
+      return;
+    }
     const prompt = [
       values.role && `Bạn là ${values.role}.`,
       values.context && `Bối cảnh: ${values.context}`,
@@ -155,6 +294,10 @@ function PromptBuilder() {
     form.setFieldsValue(storedValues);
     buildPrompt(storedValues);
   }, []);
+
+  useEffect(() => {
+    buildPrompt(form.getFieldsValue());
+  }, [language]);
 
   return (
     <ToolShell
@@ -373,10 +516,61 @@ function suggestChapter3Tools(values) {
     : "- Chọn công cụ theo đúng việc: ChatGPT/Claude cho viết và lập luận, Gemini/Perplexity cho tra cứu, NotebookLM cho tài liệu tải lên.";
 }
 
-function WorkflowPlannerChapter3() {
+function WorkflowPlannerChapter3({ language = "vi" }) {
   const [values, handleValuesChange] = useSavedFormValues("workflow-planner");
   const output = useMemo(() => {
     if (!values.goal) return "";
+
+    if (language === "en") {
+      const toolSuggestions = [
+        values.workType && `- Work type: ${values.workType}`,
+        values.dataSource && `- Data source: ${values.dataSource}`,
+        values.ecosystem && `- Ecosystem: ${values.ecosystem}`,
+        "- Consider ChatGPT/Claude for writing and reasoning, Gemini/Perplexity for web research, NotebookLM for uploaded documents, and Copilot/Gemini Workspace when work happens inside office suites.",
+      ]
+        .filter(Boolean)
+        .join("\n");
+
+      return `AI Workflow
+
+Work goal: ${values.goal}
+AI Co-pilot mindset: You provide direction and make the final decision; AI helps execute faster, summarize, and suggest ideas.
+
+Stage 1: Context & Data
+- AI role: ${values.role || "define a clear role, such as marketing expert, training assistant, or analyst"}
+- Context/data to provide: ${values.inputs || "reference documents, background information, and specific requirements"}
+- Clean the input: remove irrelevant information, organize by timeline/topic, and remove sensitive data before uploading to cloud tools.
+
+Stage 2: Prompt Engineering
+- Sample prompt:
+You are ${values.role || "a professional assistant"}. Help me complete this task: ${values.goal}.
+Context/data: ${values.inputs || "[paste cleaned data here]"}.
+Work step by step and avoid generic answers.
+Output format: ${values.format || "clear bullet list or table"}.
+- For emails/announcements, include greeting, time/location, objective, preparation materials, and a confirmation request.
+
+Stage 3: Verify
+- Check numbers, dates, and proper names.
+- Check whether citations/source links are real.
+- Assess objectivity, bias, and possible hallucinations.
+- Rule: trust but verify.
+
+Stage 4: Refine
+- Adjust tone to fit the organization/unit culture.
+- Add real-world experience that AI does not know.
+- Revise important content to improve ownership and reduce copyright risk.
+- Save strong prompts as templates for later.
+
+Tool selection suggestions
+- Work type: ${values.workType || "creative / analytical / research"}
+- Data source: ${values.dataSource || "online / offline / internal system"}
+- Security & compliance: ${values.security || "check customer data, source code, and unpublished strategy"}
+- Available ecosystem: ${values.ecosystem || "Microsoft 365 / Google Workspace / standalone tools"}
+- Cost & ROI: ${values.roi || "free / pro / enterprise"}
+
+Tools to consider:
+${toolSuggestions}`;
+    }
 
     return `Workflow ứng dụng AI
 
@@ -417,7 +611,7 @@ Gợi ý chọn công cụ
 
 Công cụ nên cân nhắc:
 ${suggestChapter3Tools(values)}`;
-  }, [values]);
+  }, [values, language]);
 
   return (
     <ToolShell
@@ -557,8 +751,25 @@ ${suggestChapter3Tools(values)}`;
   );
 }
 
-function CreativeTool() {
+function CreativeTool({ language = "vi" }) {
   const [values, handleValuesChange] = useSavedFormValues("creative-tool");
+  const englishOutput = values.topic
+    ? `Write content using the AIDA formula for this topic: ${values.topic}
+
+Audience: ${values.audience || "newly interested users"}
+Channel: ${values.channel || "social media post"}
+Length: ${values.length || "150-200 words"}
+
+Attention: Start with an attention-grabbing headline or question.
+Interest: Describe the audience's real problem and the key benefit.
+Desire: Build desire with an example, evidence, result, or short story.
+Action: End with a clear call to action.
+
+Additional requirements:
+- Use simple language and avoid difficult jargon.
+- Provide 3 headline options.
+- Suggest 1 suitable illustration or infographic idea.`
+    : "";
   const output = values.topic
     ? `Hãy viết nội dung theo công thức AIDA cho chủ đề: ${values.topic}
 
@@ -621,14 +832,14 @@ Yêu cầu thêm:
           </Card>
         </Col>
         <Col xs={24} lg={12}>
-          <OutputCard title="Prompt sáng tạo AIDA" value={output} />
+          <OutputCard title="Prompt sáng tạo AIDA" value={language === "en" ? englishOutput : output} />
         </Col>
       </Row>
     </ToolShell>
   );
 }
 
-function ResearchVerifier() {
+function ResearchVerifier({ language = "vi" }) {
   const [checked, setChecked] = useStoredState("research-verifier", []);
   const percent = Math.round((checked.length / 6) * 100);
   const checklist = [
@@ -650,6 +861,17 @@ Hãy kiểm tra thông tin sau theo phương pháp lateral reading.
 
 Thông tin cần kiểm chứng:
 [Dán nội dung tại đây]`;
+  const englishOutput = `Source verification prompt:
+
+Check the following information using lateral reading.
+1. Split the content into key claims that need verification.
+2. For each claim, suggest the type of reliable source to use.
+3. Rate confidence: High / Medium / Low.
+4. Clearly state which information needs further checking.
+5. Do not fabricate sources. If unsure, say that there is not enough evidence.
+
+Information to verify:
+[Paste content here]`;
 
   return (
     <ToolShell
@@ -677,15 +899,33 @@ Thông tin cần kiểm chứng:
           </Card>
         </Col>
         <Col xs={24} lg={12}>
-          <OutputCard title="Prompt kiểm chứng" value={output} />
+          <OutputCard title="Prompt kiểm chứng" value={language === "en" ? englishOutput : output} />
         </Col>
       </Row>
     </ToolShell>
   );
 }
 
-function AnalyticsTool() {
+function AnalyticsTool({ language = "vi" }) {
   const [values, handleValuesChange] = useSavedFormValues("analytics-tool");
+  const englishOutput = values.question
+    ? `Analyze the data using the ANALYTICA framework.
+
+A - Analyze: The data scope is ${values.scope || "the provided dataset"}.
+N - Narrative: The business context is ${values.context || "not provided; ask a clarification question if needed"}.
+A - Actionable: Provide recommendations that can be implemented immediately.
+L - Logic: Explain the reasoning chain before giving conclusions.
+Y - Yield: Output the result as ${values.format || "a summary table and bullet points"}.
+T - Trends: Identify key trends, patterns, and anomalies.
+I - Insights: Extract insights that support decision-making.
+C - Compare: Compare by ${values.compare || "suitable groups, time periods, or scenarios"}.
+A - Assumptions: List assumptions and analysis limitations.
+
+Analysis question: ${values.question}
+
+Data:
+[Paste CSV, Excel table, or data description here]`
+    : "";
   const output = values.question
     ? `Hãy phân tích dữ liệu theo khung ANALYTICA.
 
@@ -747,15 +987,35 @@ Dữ liệu:
           </Card>
         </Col>
         <Col xs={24} lg={12}>
-          <OutputCard title="Prompt ANALYTICA" value={output} />
+          <OutputCard title="Prompt ANALYTICA" value={language === "en" ? englishOutput : output} />
         </Col>
       </Row>
     </ToolShell>
   );
 }
 
-function AgentDesigner() {
+function AgentDesigner({ language = "vi" }) {
   const [values, handleValuesChange] = useSavedFormValues("agent-designer");
+  const englishInstruction = values.name
+    ? `You are ${values.name}.
+
+Goal:
+- ${values.goal || "Help users complete tasks within the assigned scope."}
+
+Response scope:
+- ${values.scope || "Answer only based on the provided documents and knowledge."}
+
+Style:
+- Concise, clear, and easy to understand for non-technical users.
+- Prioritize practical examples.
+- If the documents do not contain the information, clearly say there is not enough data.
+
+Response process:
+1. Understand the request.
+2. State assumptions if any.
+3. Answer step by step.
+4. Suggest the next step or ask a clarification question when needed.`
+    : "";
   const instruction = values.name
     ? `Bạn là ${values.name}.
 
@@ -789,6 +1049,21 @@ response_style:
   - noi_ro_khi_thieu_du_lieu
 test_cases:
   - "${values.test || "Người dùng hỏi một câu ngoài phạm vi tài liệu"}"`
+    : "";
+
+  const englishYaml = values.name
+    ? `name: ${values.name.toLowerCase().replaceAll(" ", "_")}
+role: ${values.role || "assistant"}
+model: gpt-4.1-mini
+knowledge_base: knowledge.md
+tools:
+  - retrieval
+response_style:
+  - concise
+  - clear
+  - say_when_data_is_missing
+test_cases:
+  - "${values.test || "User asks a question outside the document scope"}"`
     : "";
 
   return (
@@ -836,13 +1111,21 @@ test_cases:
                 key: "instruction",
                 label: "instruction.txt",
                 children: (
-                  <OutputCard title="Instruction" value={instruction} />
+                  <OutputCard
+                    title="Instruction"
+                    value={language === "en" ? englishInstruction : instruction}
+                  />
                 ),
               },
               {
                 key: "yaml",
                 label: "agent.yaml",
-                children: <OutputCard title="YAML cấu hình" value={yaml} />,
+                children: (
+                  <OutputCard
+                    title="YAML cấu hình"
+                    value={language === "en" ? englishYaml : yaml}
+                  />
+                ),
               },
             ]}
           />
@@ -852,7 +1135,23 @@ test_cases:
   );
 }
 
-function PromptLibrary() {
+function PromptLibrary({ language = "vi" }) {
+  const englishExamples = [
+    {
+      title: "Notification Email",
+      text: "You are a training assistant. Write an email to students announcing that the report submission deadline is before May 20. Use a polite tone, keep it under 100 words, and include an email subject, email body, and contact reminder for questions.",
+    },
+    {
+      title: "Create Slides",
+      text: "Create content for 10 slides about basic AI for beginners. Each slide should include a title, 3 key points, and a practical easy-to-understand example.",
+    },
+    {
+      title: "Summarize Document",
+      text: "Summarize the following text into 5 main points. Each point should be 1 sentence, use simple language, and preserve important numbers and proper names.",
+    },
+  ];
+  const examples = language === "en" ? englishExamples : promptExamples;
+
   return (
     <ToolShell
       icon={<Library />}
@@ -860,7 +1159,7 @@ function PromptLibrary() {
       subtitle="Các prompt nền từ bài giảng để học viên sao chép, chỉnh sửa và lưu lại thành tài sản cá nhân."
     >
       <Row gutter={[16, 16]}>
-        {promptExamples.map((item) => (
+        {examples.map((item) => (
           <Col xs={24} md={12} xl={8} key={item.title}>
             <Card className="library-card" title={item.title}>
               <Paragraph>{item.text}</Paragraph>
@@ -895,15 +1194,27 @@ function ToolShell({ icon, title, subtitle, children }) {
 
 function App() {
   const [active, setActive] = useStoredState("active-menu", "prompt");
+  const [language, setLanguage] = useStoredState("language", "vi");
   const current = {
-    prompt: <PromptBuilder />,
-    workflow: <WorkflowPlannerChapter3 />,
-    creative: <CreativeTool />,
-    research: <ResearchVerifier />,
-    analytics: <AnalyticsTool />,
-    agent: <AgentDesigner />,
-    library: <PromptLibrary />,
+    prompt: <PromptBuilder language={language} />,
+    workflow: <WorkflowPlannerChapter3 language={language} />,
+    creative: <CreativeTool language={language} />,
+    research: <ResearchVerifier language={language} />,
+    analytics: <AnalyticsTool language={language} />,
+    agent: <AgentDesigner language={language} />,
+    library: <PromptLibrary language={language} />,
   }[active];
+
+  useEffect(() => {
+    if (language !== "en") return;
+
+    const frameId = window.requestAnimationFrame(() => {
+      const root = document.getElementById("root");
+      if (root) applyEnglishInterface(root);
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [language, active]);
 
   return (
     <ConfigProvider
@@ -920,7 +1231,7 @@ function App() {
       }}
     >
       <AntApp>
-        <Layout className="app-layout">
+        <Layout className="app-layout" key={language}>
           <Sider
             className="sidebar"
             width={264}
@@ -946,6 +1257,12 @@ function App() {
           <Layout>
             <Header className="topbar">
               <Space wrap>
+                <Switch
+                  checked={language === "en"}
+                  checkedChildren="EN"
+                  unCheckedChildren="VI"
+                  onChange={(checked) => setLanguage(checked ? "en" : "vi")}
+                />
                 <Tag icon={<CheckCircle2 size={14} />} color="blue">
                   AI First
                 </Tag>
