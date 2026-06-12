@@ -156,7 +156,7 @@ const englishInterfaceMap = {
   "Chọn hệ sinh thái": "Select ecosystem",
   "Chọn mức đầu tư": "Select investment level",
   "Workflow": "Workflow",
-  "Chủ đề/sản phẩm/dịch vụ": "Topic/Product/Service",
+  "Thông tin bối cảnh": "Context Information",
   "Đối tượng": "Audience",
   "Kênh": "Channel",
   "Độ dài": "Length",
@@ -193,7 +193,7 @@ const englishAttributeMap = {
   "Dữ liệu nền, tài liệu tham khảo, email, số liệu, quy định...": "Background data, references, emails, figures, policies...",
   "VD: bảng hành động, email, 8 slide, checklist": "E.g. action table, email, 8 slides, checklist",
   "VD: không đưa danh sách khách hàng, mã nguồn, chiến lược chưa công bố lên AI miễn phí": "E.g. do not upload customer lists, source code, or unpublished strategy to free AI tools",
-  "VD: khóa học AI cơ bản cho giảng viên": "E.g. basic AI course for lecturers",
+  "VD: khóa học AI cơ bản cho giảng viên": "E.g. basic AI course for lecturers, target learners, key benefits, timeline, and communication goal",
   "VD: nhân viên hành chính, giảng viên, sinh viên": "E.g. admin staff, lecturers, students",
   "VD: 150 từ, 5 phút, 8 slide": "E.g. 150 words, 5 minutes, 8 slides",
   "VD: Vì sao doanh số tháng này giảm và nên làm gì?": "E.g. Why did sales drop this month and what should we do?",
@@ -754,7 +754,7 @@ ${suggestChapter3Tools(values)}`;
 function CreativeTool({ language = "vi" }) {
   const [values, handleValuesChange] = useSavedFormValues("creative-tool");
   const englishOutput = values.topic
-    ? `Write content using the AIDA formula for this topic: ${values.topic}
+    ? `Write content using the AIDA formula for this content: ${values.topic}
 
 Audience: ${values.audience || "newly interested users"}
 Channel: ${values.channel || "social media post"}
@@ -771,7 +771,7 @@ Additional requirements:
 - Suggest 1 suitable illustration or infographic idea.`
     : "";
   const output = values.topic
-    ? `Hãy viết nội dung theo công thức AIDA cho chủ đề: ${values.topic}
+    ? `Hãy viết nội dung theo công thức AIDA cho nội dung: ${values.topic}
 
 Đối tượng: ${values.audience || "người mới quan tâm"}
 Kênh sử dụng: ${values.channel || "bài đăng mạng xã hội"}
@@ -802,8 +802,8 @@ Yêu cầu thêm:
               initialValues={values}
               onValuesChange={handleValuesChange}
             >
-              <Form.Item name="topic" label="Chủ đề/sản phẩm/dịch vụ">
-                <Input placeholder="VD: khóa học AI cơ bản cho giảng viên" />
+              <Form.Item name="topic" label="Thông tin bối cảnh">
+                <TextArea rows={4} placeholder="VD: khóa học AI cơ bản cho giảng viên" />
               </Form.Item>
               <Form.Item name="audience" label="Đối tượng">
                 <Input placeholder="VD: nhân viên hành chính, giảng viên, sinh viên" />
